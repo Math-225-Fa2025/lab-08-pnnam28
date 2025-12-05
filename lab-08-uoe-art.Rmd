@@ -356,6 +356,15 @@ If you haven't done so recently, c*ommit and push your changes to GitHub with an
 
 ## Analysis
 
+```{r load-data}
+library(tidyverse)
+library(stringr)
+library(skimr)
+
+uoe_art <- read.csv("data/uoe_art.csv")
+glimpse(uoe_art)
+```
+
 ::: {.box}
 Work in `lab-08.Rmd` for the rest of the lab.
 :::
@@ -380,14 +389,60 @@ And once we have completed separating the single `title` column into `title` and
 ```
 
 9.  Fill in the blanks in to implement the data wrangling we described above. Note that this will result in some warnings when you run the code, and that's OK! Read the warnings, and explain what they mean, and why we are ok with leaving them in given that our objective is to just capture `year` where it's convenient to do so.
+
+```{r clean-titles}
+uoe_art_clean <- uoe_art %>%
+  separate(
+    col   = title,
+    into  = c("title", "date"),
+    sep   = "\\(",
+    extra = "merge",
+    fill  = "right"
+  ) %>%
+  mutate(
+    # remove closing ) if present
+    date = str_remove(date, "\\)"),
+    # grab a 4-digit year anywhere in the date string
+    year = str_extract(date, "\\d{4}"),
+    year = as.numeric(year)
+  )
+
+uoe_art_clean %>% head()
+```
+
+ANSWER:  When I run the `separate()` and `mutate()` code, R prints some warnings about some rows not being split or some values being `NA`. These warnings occur because not every title contains parentheses or meaningful date information, so in those cases the `date` column ends up as `NA` or doesn’t contain a four-digit year for `str_extract()` to pick up. That’s acceptable, since we only want to capture a year when it is clearly available and are okay leaving `year` as missing when it’s not.
+
 10. Print out a summary of the data frame using the `skim()` function. How many pieces have artist info missing? How many have year info missing?
+
+```{r skim}
+skim(uoe_art_clean)
+
+```
+
+ANSWER: According to the summary, there are 3320 pieces with missing artist information and  900 pieces with missing year information.
+
 11. Make a histogram of years. Use a reasonable binwidth. Do you see anything out of the ordinary?
 
+```{r hist-years}
+uoe_art_clean %>%
+  ggplot(aes(x = year)) +
+  geom_histogram(binwidth = 5, na.rm = TRUE) +
+  labs(
+    title = "Distribution of artwork years in the Edinburgh College of Art collection",
+    x = "Year",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+  ANSWER: The histogram shows that most works in the collection are from the 19th and 20th centuries, with a heavy concentration in the mid-20th century. There is one clear outlier year that sits far away from the main cluster, which suggests that either the date was recorded differently or our extraction code mis-parsed the year for that piece.
+  
 ```{marginfigure}
 **Hint:** You'll want to use `mutate()` and `if_else()` or `case_when()` to implement the correction.
 ```
 
 12. Find which piece has the out of the ordinary year and go to its page on the art collection website to find the correct year for it. Can you tell why our code didn't capture the correct year information? Correct the error in the data frame and visualize the data again.
+
+
 
 *If you haven't done so recently, knit, commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 

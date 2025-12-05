@@ -2,8 +2,11 @@
 #
 library(tidyverse)
 library(rvest)
-library(glue)
+library(stringr)
+library(purrr)
 #
+
+source("scripts/02-scrape-page-function.R")
 ## list of urls to be scraped ---------------------------------------------------
 #
 root <- "https://collections.ed.ac.uk/art/search/*:*/Collection:%22edinburgh+college+of+art%7C%7C%7CEdinburgh+College+of+Art%22?offset="
@@ -22,4 +25,5 @@ uoe_art <- map_dfr(urls, scrape_page)
 #
 ## write out data frame ---------------------------------------------------------
 #
-write_csv(uoe_art, "data/uoe_art.csv")
+write.csv(uoe_art, "data/uoe_art.csv", row.names = FALSE)
+
