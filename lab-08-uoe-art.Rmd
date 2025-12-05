@@ -1,5 +1,6 @@
 ---
 title: "Lab 08 - University of Edinburgh Art Collection"
+author: "Nam Pham"
 output: 
   tufte::tufte_html:
     css: ../lab.css
@@ -107,7 +108,7 @@ Instead you'll be scraping the data!
 But before doing so, let's check that a bot has permissions to access pages on this domain.
 
 ```{r paths-allowed, warning=FALSE}
-paths_allowed("https://collections.ed.ac.uk/art)")
+paths_allowed("https://collections.ed.ac.uk/art")
 ```
 
 # Exercises
